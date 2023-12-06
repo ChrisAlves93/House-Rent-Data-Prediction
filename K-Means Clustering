@@ -1,0 +1,35 @@
+import pandas as pd
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the data from the CSV file
+data = pd.read_csv("House_Rent_Dataset.csv")
+
+# List of unique cities in the dataset
+cities = data['City'].unique()
+
+# Set up subplots
+fig, axs = plt.subplots(len(cities), 1, figsize=(8, 6 * len(cities)), sharex=True, sharey=True)
+
+# Iterate over each city and perform k-means clustering
+for i, city in enumerate(cities):
+    city_data = data[data['City'] == city][['Size', 'Rent']]
+    
+    # Specify the number of clusters (you need to define this based on your data)
+    k = 1
+    
+    # Perform k-means clustering
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    city_data['cluster'] = kmeans.fit_predict(city_data)
+    
+    # Plot the clusters for each city
+    sns.scatterplot(x='Size', y='Rent', hue='cluster', data=city_data, ax=axs[i], palette='viridis')
+    axs[i].scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], s=200, c='red', marker='X', label='Centroids')
+    axs[i].set_title(f'K-Means Clustering - {city}')
+    axs[i].legend()
+
+plt.xlabel('Room Size')
+plt.ylabel('Price')
+plt.tight_layout()
+plt.show()
